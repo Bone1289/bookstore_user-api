@@ -6,27 +6,27 @@ import (
 	"github.com/Bone1289/bookstore_user-api/utils/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func GetUser(c *gin.Context) {
-	c.String(http.StatusNotImplemented, "implement me")
+	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if userErr != nil {
+		err := errors.NewBadRequestError("user id needs to be a number")
+		c.JSON(err.Status, err)
+		return
+	}
+
+	user, getErr := service.GetUser(userId)
+	if getErr != nil {
+		c.JSON(getErr.Status, getErr)
+		return
+	}
+	c.JSON(http.StatusOK, user)
 }
 
 func CreateUser(c *gin.Context) {
 	var user users.User
-	//fmt.Println(user)
-	//bytes, err := ioutil.ReadAll(c.Request.Body)
-	//
-	//if err != nil {
-	//	//TODO: Handle error
-	//	return
-	//}
-	//
-	//if err := json.Unmarshal(bytes, &user); err != nil {
-	//	fmt.Println(err.Error())
-	//	//TODO: Handle error
-	//	return
-	//}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := errors.NewBadRequestError("invalid json body")
